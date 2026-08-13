@@ -1,0 +1,145 @@
+#!/usr/bin/env nbb
+;; docs/check-migration-identity.cljs — is the extracted subtree still the one
+;; migration.edn says it is?
+;;
+;;   nbb docs/check-migration-identity.cljs        # from the repo root
+;;   nbb docs/check-migration-identity.cljs <dir>  # or point it at a checkout
+;;
+;; `migration.edn` records a provenance claim: this repo is
+;; `60-apps/etzhayyim-project-gol-d-roger` lifted verbatim out of
+;; `etzhayyim/root` at a named revision — 14 tracked files, 27,274 bytes — plus
+;; exactly two files that the extraction itself added (`README.edn`,
+;; `migration.edn`).
+;;
+;; Nothing checked it. A provenance record nobody verifies is a sentence, not a
+;; guarantee: the extracted files could be edited in place and the record would
+;; go on asserting they were verbatim. This re-derives the claim from git.
+;;
+;; What it fails on is narrow and deliberate: a migrated file being **changed,
+;; moved, or deleted**, or the recorded count/byte total no longer matching the
+;; extraction commit. Files added *after* the extraction (this document, the
+;; README, a .gitignore) are reported and do not fail — later work is expected,
+;; tampering with the lifted tree is not.
+;;
+;; Exit codes are three-valued on purpose. "Could not measure" must never be
+;; reachable from the same exit code as "measured, all fine":
+;;
+;;   0  the extracted subtree is intact and matches migration.edn
+;;   1  it does not — a migrated file changed, or the recorded totals are wrong
+;;   3  COULD NOT ANSWER — no git, no migration.edn, no unique root commit, or
+;;      zero files examined. Never report a pass in this case.
+
+(ns check-migration-identity
+  (:require ["node:child_process" :as cp]
+            ["node:fs" :as fs]
+            ["node:path" :as path]
+            ["node:process" :as process]
+            [clojure.edn :as edn]
+            [clojure.string :as str]))
+
+(defn- git
+  "git stdout as a trimmed string, or nil if the command failed."
+  [dir & args]
+  (try
+    (str/trim (str (cp/execSync (str "git " (str/join " " args))
+                                #js {:cwd dir :encoding "utf8" :stdio #js ["ignore" "pipe" "ignore"]})))
+    (catch :default _ nil)))
+
+(defn- cannot-answer! [& lines]
+  (doseq [l lines] (println l))
+  (println "Refusing to report a pass.")
+  (process/exit 3))
+
+(defn- read-migration [dir]
+  (let [f (path/join dir "migration.edn")]
+    (when (fs/existsSync f)
+      (try (edn/read-string (str (fs/readFileSync f "utf8")))
+           (catch :default e
+             (cannot-answer!
+              (str "COULD NOT ANSWER: migration.edn is present but unreadable: " (.-message e))))))))
+
+(defn -main [argv]
+  (let [dir (or (first (remove #(str/starts-with? % "--") argv)) (process/cwd))
+        mig (read-migration dir)]
+
+    (when-not (git dir "rev-parse" "--git-dir")
+      (cannot-answer! (str "COULD NOT ANSWER: " dir " is not a git checkout.")
+                      "The claim is derived from git history; without it there is nothing to derive."))
+
+    (when-not mig
+      (cannot-answer! (str "COULD NOT ANSWER: no migration.edn under " dir ".")
+                      "This script verifies that file's claim. With no claim there is nothing to verify."))
+
+    (let [roots (some-> (git dir "rev-list" "--max-parents=0" "HEAD") (str/split #"\n")
+                        (->> (remove str/blank?)))
+          expect-files (get-in mig [:source :tracked-files])
+          expect-bytes (get-in mig [:source :bytes])
+          allowed (set (get-in mig [:identity :allowed-additions]))]
+
+      (when (not= 1 (count roots))
+        (cannot-answer!
+         (str "COULD NOT ANSWER: expected exactly one root commit, found " (count roots) ".")
+         "The extraction commit is identified as the single root of this history."
+         "With zero or several, this script cannot tell which tree was the extracted one."))
+
+      (when-not (and (number? expect-files) (number? expect-bytes))
+        (cannot-answer!
+         "COULD NOT ANSWER: migration.edn does not record both :source :tracked-files and :source :bytes."
+         "Those two numbers are the claim. Without them there is no assertion to test."))
+
+      (let [root (first roots)
+            listing (git dir "ls-tree" "-r" "-l" "--full-name" root)
+            entries (->> (str/split (or listing "") #"\n")
+                         (remove str/blank?)
+                         (keep (fn [line]
+                                 ;; <mode> <type> <sha> <size>\t<path>
+                                 (let [[meta p] (str/split line #"\t" 2)
+                                       cols (str/split (str/trim meta) #"\s+")]
+                                   (when (and p (= 4 (count cols)))
+                                     {:path p :bytes (js/parseInt (nth cols 3) 10)})))))
+            migrated (remove #(contains? allowed (:path %)) entries)
+            n (count migrated)
+            b (reduce + 0 (map :bytes migrated))]
+
+        ;; Evidence floor: an empty listing must not read as a clean listing.
+        (when (zero? (count entries))
+          (cannot-answer!
+           (str "COULD NOT ANSWER: the extraction commit " (subs root 0 7) " lists 0 files.")
+           "Either git returned nothing or the tree is empty; both mean this was not measured."))
+
+        (let [drift (git dir "diff" "--name-status" root "--" (str/join " " (map #(str "'" (:path %) "'") migrated)))
+              drift-rows (->> (str/split (or drift "") #"\n") (remove str/blank?))
+              now-tracked (->> (str/split (or (git dir "ls-files") "") #"\n") (remove str/blank?) set)
+              extraction-paths (set (map :path entries))
+              added-since (sort (remove extraction-paths now-tracked))
+              count-ok? (= n expect-files)
+              bytes-ok? (= b expect-bytes)]
+
+          (println (str "EXAMINED\t" (count entries) " files at root commit " (subs root 0 7)
+                        "\tMIGRATED\t" n "\tALLOWED-ADDITIONS\t" (count allowed)))
+          (println (str "source\t" (get-in mig [:source :repository])
+                        "@" (some-> (get-in mig [:source :revision]) (subs 0 10))
+                        "\t" (get-in mig [:source :path])))
+          (println)
+          (println (str "tracked-files  recorded " expect-files "\tmeasured " n
+                        "\t" (if count-ok? "match" "MISMATCH")))
+          (println (str "bytes          recorded " expect-bytes "\tmeasured " b
+                        "\t" (if bytes-ok? "match" "MISMATCH")))
+          (println (str "migrated files changed since extraction: " (count drift-rows)))
+          (doseq [r drift-rows] (println (str "  " r)))
+          (println (str "files added since extraction (not a failure): " (count added-since)))
+          (doseq [a added-since] (println (str "  + " a)))
+          (println)
+
+          (if (and count-ok? bytes-ok? (empty? drift-rows))
+            (do (println "Extracted subtree is intact and matches migration.edn.")
+                (process/exit 0))
+            (do (println "Extracted subtree no longer matches migration.edn.")
+                (println "Either the lifted files were edited in place — in which case this repo is no")
+                (println "longer a verbatim extraction and the record should say so — or the record is")
+                (println "wrong. Do not leave both standing.")
+                (process/exit 1))))))))
+
+;; nbb hands us [node, nbb, this-script, ...args]; drop anything that is this
+;; script's own path so `<dir>` can be given as the first real argument.
+(-main (vec (remove #(str/ends-with? % ".cljs") (drop 2 (.-argv process)))))
