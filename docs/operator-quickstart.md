@@ -20,7 +20,7 @@ lifted verbatim out of `etzhayyim/root` — 14 tracked files, 27,274 bytes — p
 two files the extraction added. Nothing checked that until now.
 
 ```bash
-nbb docs/check-migration-identity.cljs
+nbb docs/check-migration-identity.cljk
 ```
 
 Observed:
@@ -48,7 +48,7 @@ commit. Confirmed by running it against an empty directory:
 ## 2. Do the hosts this repo names exist? (≈2 s, needs DNS)
 
 ```bash
-nbb docs/check-surface.cljs
+nbb docs/check-surface.cljk
 ```
 
 Observed — exit `1`:

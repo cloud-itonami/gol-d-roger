@@ -14,7 +14,7 @@ does not override it.
 Sixteen files. Fourteen were lifted verbatim out of `etzhayyim/root` at
 `60-apps/etzhayyim-project-gol-d-roger`; two (`README.edn`, `migration.edn`)
 were added by the extraction itself. That claim is machine-checkable — see
-[`docs/check-migration-identity.cljs`](docs/check-migration-identity.cljs).
+[`docs/check-migration-identity.cljk`](docs/check-migration-identity.cljk).
 
 | | |
 |---|---|
@@ -31,7 +31,7 @@ not as a description of code that exists.
 ## Declared hosts — 4 of 5 do not exist (measured 2026-08-13)
 
 The metadata names hosts the app would talk to. Re-measure with
-[`docs/check-surface.cljs`](docs/check-surface.cljs); it extracts the hosts from
+[`docs/check-surface.cljk`](docs/check-surface.cljk); it extracts the hosts from
 the files that declare them rather than carrying a hardcoded list.
 
 | Host | DNS | Declared in (config and design files) |
@@ -89,8 +89,8 @@ Both checkers use three-valued exit codes on purpose: "could not measure" is
 never reachable from the same exit code as "measured, all fine".
 
 ```bash
-nbb docs/check-migration-identity.cljs   # 0 intact · 1 tampered · 3 cannot answer
-nbb docs/check-surface.cljs              # 0 all resolve · 1 some NXDOMAIN · 3 cannot answer
+nbb docs/check-migration-identity.cljk   # 0 intact · 1 tampered · 3 cannot answer
+nbb docs/check-surface.cljk              # 0 all resolve · 1 some NXDOMAIN · 3 cannot answer
 ```
 
 On 2026-08-13 the first exits 0 and the second exits 1. Both were also observed
