@@ -89,8 +89,8 @@ Both checkers use three-valued exit codes on purpose: "could not measure" is
 never reachable from the same exit code as "measured, all fine".
 
 ```bash
-nbb docs/check-migration-identity.cljk   # 0 intact · 1 tampered · 3 cannot answer
-nbb docs/check-surface.cljk              # 0 all resolve · 1 some NXDOMAIN · 3 cannot answer
+kbb --backend sci docs/check-migration-identity.cljk   # 0 intact · 1 tampered · 3 cannot answer
+kbb --backend sci docs/check-surface.cljk              # 0 all resolve · 1 some NXDOMAIN · 3 cannot answer
 ```
 
 On 2026-08-13 the first exits 0 and the second exits 1. Both were also observed
