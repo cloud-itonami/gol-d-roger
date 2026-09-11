@@ -1,9 +1,9 @@
 #!/usr/bin/env nbb
-;; docs/check-migration-identity.cljs — is the extracted subtree still the one
+;; docs/check-migration-identity.cljk — is the extracted subtree still the one
 ;; migration.edn says it is?
 ;;
-;;   nbb docs/check-migration-identity.cljs        # from the repo root
-;;   nbb docs/check-migration-identity.cljs <dir>  # or point it at a checkout
+;;   nbb docs/check-migration-identity.cljk        # from the repo root
+;;   nbb docs/check-migration-identity.cljk <dir>  # or point it at a checkout
 ;;
 ;; `migration.edn` records a provenance claim: this repo is
 ;; `60-apps/etzhayyim-project-gol-d-roger` lifted verbatim out of
