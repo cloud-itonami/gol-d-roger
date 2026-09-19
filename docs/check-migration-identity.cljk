@@ -142,4 +142,4 @@
 
 ;; nbb hands us [node, nbb, this-script, ...args]; drop anything that is this
 ;; script's own path so `<dir>` can be given as the first real argument.
-(-main (vec (remove #(str/ends-with? % ".cljs") (drop 2 (.-argv process)))))
+(-main (vec (remove #(str/ends-with? % ".cljk") (drop 2 (.-argv process)))))
