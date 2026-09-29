@@ -57,9 +57,9 @@ Observed — exit `1`:
 SCANNED	13 files	DECLARED-HOSTS	5
 control	registry.npmjs.org	resolves
 
-   br8bojxp.etzhayyim.com  NXDOMAIN  <- CLAUDE.md, README.md, …
-            etzhayyim.com  resolves  <- CLAUDE.md, README.md, …/kotodama.jsonld, …
-gol-d-roger.etzhayyim.com  NXDOMAIN  <- CLAUDE.md, PROJECT.jsonld, …/kotodama.jsonld, …
+   br8bojxp.etzhayyim.com  NXDOMAIN  <- AGENTS.md, README.md, …
+            etzhayyim.com  resolves  <- AGENTS.md, README.md, …/kotodama.jsonld, …
+gol-d-roger.etzhayyim.com  NXDOMAIN  <- AGENTS.md, PROJECT.jsonld, …/kotodama.jsonld, …
   resources.etzhayyim.com  NXDOMAIN  <- PROJECT.jsonld, README.md, …
    wy2zvdvd.etzhayyim.com  NXDOMAIN  <- PROJECT.jsonld, README.md, …
 
@@ -68,7 +68,7 @@ gol-d-roger.etzhayyim.com  NXDOMAIN  <- CLAUDE.md, PROJECT.jsonld, …/kotodama.
 
 (The "declared in" column is abbreviated above. The script scans `.md`, so it
 attributes each host to this file and the README as well — they name the hosts
-in prose. The hosts originate in `CLAUDE.md`, `PROJECT.jsonld`, and
+in prose. The hosts originate in `AGENTS.md`, `PROJECT.jsonld`, and
 `kotodama.jsonld`.)
 
 The control host is checked first: if `registry.npmjs.org` fails the script
@@ -195,7 +195,7 @@ repo. It is recorded here rather than silently decided.
 
 Not "not yet documented" — absent from the tree:
 
-| Named in `CLAUDE.md` | State |
+| Named in `AGENTS.md` | State |
 |---|---|
 | `proto/etzhayyim/gol_d_roger/v1/gol_d_roger.proto` | No `proto/` directory. |
 | `GoldQueryService`, `GoldCommandService` | No service implementation. |

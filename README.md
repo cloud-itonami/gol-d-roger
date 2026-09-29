@@ -3,7 +3,7 @@
 The name says nothing about the subject, so: **this repo is about gold** — spot
 and futures pricing, physical/paper/digital holdings, vault inventory, tax lots.
 `gol-d-roger` is a One Piece reference that happens to contain "gold"; it is a
-discovery alias, not a description. `CLAUDE.md` is the design document.
+discovery alias, not a description. `AGENTS.md` is the design document.
 
 `README.edn` remains the canonical machine-readable metadata
 (`:canonical-metadata :edn`). This file is prose for a human arriving cold, and
@@ -18,13 +18,13 @@ were added by the extraction itself. That claim is machine-checkable — see
 
 | | |
 |---|---|
-| `CLAUDE.md` (8.6 kB) | The design document: control plane, risk engine, Arrow tables, XRPC fan-out to 12 ISIC/ISCO actors, six Matrix rooms. |
+| `AGENTS.md` (8.6 kB) | The design document: control plane, risk engine, Arrow tables, XRPC fan-out to 12 ISIC/ISCO actors, six Matrix rooms. |
 | `appview/etzhayyim-wasm-gol-d-roger-wy2zvdvd/svelte/` | A Vite + Svelte 5 scaffold. `App.svelte` renders one `<h1>` and the sentence "Vite entry scaffold after SvelteKit cleanup." |
 | `PROJECT.jsonld`, `kotodama.jsonld`, `migration.edn`, `NOTICE` | Metadata and provenance. |
 
 **Nothing in the design document is implemented here.** There is no `proto/`,
 no `src/` at the repo root, no service, no Arrow table, no XRPC client, no test.
-The gap between `CLAUDE.md` and the tree is the single most important thing to
+The gap between `AGENTS.md` and the tree is the single most important thing to
 know before planning work against this repo — read the document as an intent,
 not as a description of code that exists.
 
@@ -36,9 +36,9 @@ the files that declare them rather than carrying a hardcoded list.
 
 | Host | DNS | Declared in (config and design files) |
 |---|---|---|
-| `br8bojxp.etzhayyim.com` | NXDOMAIN | `CLAUDE.md` |
-| `etzhayyim.com` | resolves | `CLAUDE.md`, `kotodama.jsonld` |
-| `gol-d-roger.etzhayyim.com` | NXDOMAIN | `CLAUDE.md`, `PROJECT.jsonld`, `kotodama.jsonld` |
+| `br8bojxp.etzhayyim.com` | NXDOMAIN | `AGENTS.md` |
+| `etzhayyim.com` | resolves | `AGENTS.md`, `kotodama.jsonld` |
+| `gol-d-roger.etzhayyim.com` | NXDOMAIN | `AGENTS.md`, `PROJECT.jsonld`, `kotodama.jsonld` |
 | `resources.etzhayyim.com` | NXDOMAIN | `PROJECT.jsonld` |
 | `wy2zvdvd.etzhayyim.com` | NXDOMAIN | `PROJECT.jsonld` |
 
