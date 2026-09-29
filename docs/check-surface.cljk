@@ -8,7 +8,7 @@
 ;;
 ;; It does not carry a hardcoded host list — it extracts the hosts from the
 ;; files that declare them (here: PROJECT.jsonld, the agent descriptor
-;; kotodama.jsonld, and CLAUDE.md), so adding a host to the config brings it
+;; kotodama.jsonld, and AGENTS.md), so adding a host to the config brings it
 ;; under the check automatically.
 ;;
 ;; Fourth copy of a script that originated in cloud-itonami/game-play-uploader
@@ -19,7 +19,7 @@
 ;;
 ;; ONE DIVERGENCE from the gameya copy, made 2026-08-13: `.md` is in `scan-exts`.
 ;; Copied verbatim it reported 4 declared hosts here and silently missed a
-;; fifth — `br8bojxp.etzhayyim.com`, which this repo declares only in CLAUDE.md.
+;; fifth — `br8bojxp.etzhayyim.com`, which this repo declares only in AGENTS.md.
 ;; A checker blind to a declaration site prints the same "3 of 4 do not exist"
 ;; whether the file it cannot read is fine or not, so under-reporting is
 ;; indistinguishable from a clean reading. Port `.md` back to the earlier copies
